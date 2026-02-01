@@ -67,36 +67,39 @@ Obter `project_id` e `user_id` do CLAUDE.md do projeto atual. Se não existir, p
 ```
 ✓ Task "Corrigir erro no dark mode" → done
 
-ℹ Encontrei documentação existente: "Dark Mode" (spec)
+ℹ Encontrei documentação existente: "Dark Mode" (guides)
 ℹ Quer atualizar a documentação? (s/n)
 ```
 
 ---
 
-## Tipos de Documento
+## Tipos de Documento (Folders)
 
-| Tipo | Quando usar | Template |
-|------|-------------|----------|
-| `spec` | Especificação técnica detalhada | [templates/spec.md](templates/spec.md) |
-| `guide` | Guia de uso para usuários/devs | [templates/guide.md](templates/guide.md) |
-| `api` | Documentação de endpoints/API | [templates/api.md](templates/api.md) |
-| `technical` | Doc técnica de arquitetura | [templates/technical.md](templates/technical.md) |
-| `prp` | Product Requirements Plan | [templates/prp.md](templates/prp.md) |
-| `design` | Decisões de design/UX | - |
-| `note` | Anotações gerais | - |
-| `meeting_notes` | Atas de reunião | - |
-| `business` | Documentação de negócio | - |
+O Roobin organiza documentos em **folders** (pastas). Use o campo `document_type` para definir a pasta:
 
-### Inferência Automática de Tipo
+| Folder | Descrição | Quando usar | Template |
+|--------|-----------|-------------|----------|
+| `planning` | PRDs, roadmaps, estratégia | Requisitos de produto, planejamento | [planning.md](templates/planning.md) |
+| `architecture` | ADRs, diagramas, decisões técnicas | Arquitetura, design de sistema | [architecture.md](templates/architecture.md) |
+| `specs` | Especificações, APIs, contratos | Specs técnicas, documentação de API | [specs.md](templates/specs.md), [specs-api.md](templates/specs-api.md) |
+| `guides` | Tutoriais, how-tos, documentação | Guias de uso, onboarding | [guides.md](templates/guides.md) |
+| `research` | Análises, descobertas, estudos | Pesquisa de usuário, análise técnica | - |
+| `quality` | Testes, QA, qualidade | Planos de teste, relatórios de QA | - |
+| `reports` | Reuniões, status, relatórios | Atas, status reports | - |
+| `general` | Notas, misc | Anotações gerais, rascunhos | - |
 
-| Contexto da task | Tipo inferido |
-|------------------|---------------|
-| Feature de UI/UX | `guide` |
-| Feature de API/backend | `api` ou `technical` |
-| Feature de arquitetura | `technical` |
-| Feature de design | `design` |
-| Planejamento/requisitos | `prp` |
-| Default | `spec` |
+### Inferência Automática de Folder
+
+| Contexto da task | Folder inferido |
+|------------------|-----------------|
+| Feature de UI/UX | `guides` |
+| Feature de API/backend | `specs` |
+| Feature de arquitetura | `architecture` |
+| Planejamento/requisitos | `planning` |
+| Testes/QA | `quality` |
+| Pesquisa/análise | `research` |
+| Reunião/status | `reports` |
+| Default | `general` |
 
 ---
 
@@ -166,7 +169,7 @@ A skill `roobin-docs` lê esse contexto e:
 ### Busca
 ```
 ℹ Documentação encontrada para "{feature}":
-  - [doc-123] {Título} (spec, v3)
+  - [doc-123] {Título} (specs, v3)
   - Última atualização: {data}
 ```
 
@@ -269,10 +272,10 @@ flowchart TD
 
 ### Quando Usar Mermaid
 
-- ✓ Documentação de arquitetura (`technical`)
-- ✓ Especificações com fluxos (`spec`)
-- ✓ Documentação de API com sequências (`api`)
-- ✓ Design system e componentes (`design`)
+- ✓ Documentação de arquitetura (`architecture`)
+- ✓ Especificações com fluxos (`specs`)
+- ✓ Documentação de API com sequências (`specs`)
+- ✓ Guias com fluxos de usuário (`guides`)
 - ✓ Qualquer doc que beneficie de visualização
 
 ### Temas
@@ -285,11 +288,43 @@ O Mermaid renderiza automaticamente no tema correto (dark/light) baseado no tema
 
 | Ação | Tool |
 |------|------|
-| Buscar | `search_documents(project_id, query/document_id)` |
-| Criar | `manage_document(action="create", project_id, title, content, document_type, status, tags)` |
-| Atualizar | `manage_document(action="update", project_id, document_id, ...)` |
-| Versionar | `manage_version(action="create", project_id, document_id, change_summary)` |
-| Ver versões | `find_versions(project_id, document_id)` |
+| Buscar | `mcp__roobin__search_documents` |
+| Criar | `mcp__roobin__manage_document` (action: create) |
+| Atualizar | `mcp__roobin__manage_document` (action: update) |
+| Versionar | `mcp__roobin__manage_version` (action: create) |
+| Ver versões | `mcp__roobin__find_versions` |
+
+### Parâmetros de manage_document
+
+```yaml
+mcp__roobin__manage_document:
+  action: "create"  # create | update | delete
+  project_id: "{project_id}"
+  title: "Título do documento"
+  content:
+    markdown: |
+      # Conteúdo em markdown
+
+      Suporta rich blocks:
+      - <toggle title="...">content</toggle>
+      - <callout type="info|warning|tip|error">content</callout>
+      - <quote author="..." source="...">content</quote>
+      - <embed url="..."/>
+  document_type: "specs"  # planning|architecture|specs|guides|research|quality|reports|general
+  status: "published"     # draft|published|archived
+  tags: ["tag1", "tag2"]
+  is_pinned: false
+```
+
+### Parâmetros de search_documents
+
+```yaml
+mcp__roobin__search_documents:
+  project_id: "{project_id}"
+  query: "termo de busca"       # busca por título/conteúdo
+  document_id: "{document_id}"  # busca direta por ID
+  document_type: "specs"        # filtrar por folder
+```
 
 ---
 
