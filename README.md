@@ -6,6 +6,22 @@
 
 Roobin Skills is a comprehensive skill system designed for [Claude Code](https://claude.ai/code) that implements a complete software development lifecycle through specialized AI agents. Each skill is self-contained and optimized for specific tasks, enabling efficient delegation and parallel execution.
 
+## Repository Structure
+
+```
+roobin-skills/
+├── README.md
+├── LICENSE
+└── skills/
+    ├── roobin-orchestrator/   # Master delegator
+    ├── roobin-planner/        # Implementation planning
+    ├── roobin-dev/            # Code implementation
+    ├── roobin-reviewer/       # Code review (0-100 scoring)
+    ├── roobin-ops/            # Git operations & deployment
+    ├── roobin-tasks/          # Task management
+    └── roobin-docs/           # Documentation
+```
+
 ## Architecture
 
 ```
@@ -50,14 +66,14 @@ Roobin Skills is a comprehensive skill system designed for [Claude Code](https:/
 
 ## Installation
 
-### Option 1: Clone to Claude Skills Directory
+### Option 1: Copy All Skills
 
 ```bash
 # Clone the repository
 git clone https://github.com/caiorodrigo10/roobin-skills.git
 
 # Copy skills to Claude Code skills directory
-cp -r roobin-skills/* ~/.claude/skills/
+cp -r roobin-skills/skills/* ~/.claude/skills/
 ```
 
 ### Option 2: Symlink Individual Skills
@@ -67,11 +83,22 @@ cp -r roobin-skills/* ~/.claude/skills/
 git clone https://github.com/caiorodrigo10/roobin-skills.git ~/roobin-skills
 
 # Symlink specific skills
-ln -s ~/roobin-skills/roobin-orchestrator ~/.claude/skills/roobin-orchestrator
-ln -s ~/roobin-skills/roobin-planner ~/.claude/skills/roobin-planner
-ln -s ~/roobin-skills/roobin-dev ~/.claude/skills/roobin-dev
-ln -s ~/roobin-skills/roobin-reviewer ~/.claude/skills/roobin-reviewer
-ln -s ~/roobin-skills/roobin-ops ~/.claude/skills/roobin-ops
+ln -s ~/roobin-skills/skills/roobin-orchestrator ~/.claude/skills/roobin-orchestrator
+ln -s ~/roobin-skills/skills/roobin-planner ~/.claude/skills/roobin-planner
+ln -s ~/roobin-skills/skills/roobin-dev ~/.claude/skills/roobin-dev
+ln -s ~/roobin-skills/skills/roobin-reviewer ~/.claude/skills/roobin-reviewer
+ln -s ~/roobin-skills/skills/roobin-ops ~/.claude/skills/roobin-ops
+```
+
+### Option 3: Symlink Entire Skills Folder
+
+```bash
+# Clone the repository
+git clone https://github.com/caiorodrigo10/roobin-skills.git ~/roobin-skills
+
+# Symlink all skills at once (backup existing first)
+mv ~/.claude/skills ~/.claude/skills.backup
+ln -s ~/roobin-skills/skills ~/.claude/skills
 ```
 
 ## Usage
@@ -103,7 +130,7 @@ Skills are automatically activated based on context, or you can invoke them dire
 Each skill follows a consistent structure:
 
 ```
-skill-name/
+skills/skill-name/
 ├── SKILL.md              # Main skill definition (required)
 ├── tasks/                # Task workflows
 ├── workflows/            # Multi-step processes
