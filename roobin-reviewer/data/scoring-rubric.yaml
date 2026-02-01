@@ -1,0 +1,180 @@
+# Scoring Rubric for Code Review
+# Used by roobin-reviewer to calculate objective scores
+
+version: "1.0"
+
+# Method: Deduction-based scoring
+# Start at 100, subtract based on findings
+scoring_method: deduction
+
+base_score: 100
+minimum_score: 0
+maximum_score: 100
+
+# Deductions by severity
+deductions:
+  critical:
+    points: -20
+    description: "Vulnerabilidade, bug que quebra funcionalidade, seguranca"
+    examples:
+      - "SQL injection"
+      - "Hardcoded secrets/credentials"
+      - "Null pointer exception garantido"
+      - "XSS vulnerability"
+      - "Authentication bypass"
+      - "Data exposure"
+    action: "DEVE corrigir antes de merge"
+    blocks_approval: true
+
+  major:
+    points: -10
+    description: "Bug importante, falta de tratamento de erro, teste critico faltando"
+    examples:
+      - "Error handling ausente em operacao critica"
+      - "Race condition possivel"
+      - "Teste critico faltando"
+      - "Memory leak potencial"
+      - "Validation bypass"
+      - "Missing authorization check"
+    action: "DEVERIA corrigir antes de merge"
+    blocks_approval: true
+
+  minor:
+    points: -5
+    description: "Melhoria de qualidade, boas praticas"
+    examples:
+      - "Naming conventions nao seguidas"
+      - "Duplicacao de codigo"
+      - "Magic numbers"
+      - "Falta de tipagem"
+      - "Comentario ausente em logica complexa"
+    action: "Pode corrigir depois"
+    blocks_approval: false
+
+  suggestion:
+    points: -2
+    description: "Nice-to-have, refatoracao opcional"
+    examples:
+      - "Refatoracao para melhor legibilidade"
+      - "Comentario adicional"
+      - "Alternativa mais elegante"
+      - "Performance micro-otimization"
+    action: "Considerar para futuro"
+    blocks_approval: false
+
+# Confidence filtering
+# Only report issues with confidence >= threshold
+confidence:
+  threshold: 80
+  levels:
+    0-25: "Falso positivo ou issue pre-existente - NAO REPORTAR"
+    26-50: "Nitpick nao explicito no CLAUDE.md - NAO REPORTAR"
+    51-75: "Issue real mas baixo impacto - NAO REPORTAR"
+    76-90: "Issue importante, verificado - REPORTAR"
+    91-100: "Bug critico ou violacao explicita - REPORTAR"
+
+# Score thresholds for status decisions
+status_thresholds:
+  done:
+    min_score: 90
+    condition: "Score >= 90 AND no critical/major findings AND needs_human_review == false"
+    description: "Aprovado automaticamente, pode fazer merge"
+
+  human-review:
+    min_score: 70
+    max_score: 89
+    condition: "Score 70-89 OR needs_human_review == true"
+    description: "Precisa revisao humana antes de merge"
+
+  ai-review:
+    min_score: 50
+    max_score: 69
+    condition: "Score 50-69"
+    description: "Precisa correcoes menores, retorna para dev"
+
+  doing:
+    min_score: 0
+    max_score: 49
+    condition: "Score < 50"
+    description: "Issues significativos, reprovar e voltar para dev"
+
+# Special rule: needs_human_review flag
+needs_human_review_override:
+  enabled: true
+  description: "Se task.needs_human_review == true, SEMPRE vai para human-review independente da nota"
+  force_status: "human-review"
+
+# Approval logic
+approval:
+  approved: "true SOMENTE se NENHUM finding critical ou major"
+  approved_with_minor: "Aprovado com observacoes se apenas minor/suggestion"
+
+# Review output JSON structure
+output_schema:
+  approved: "boolean"
+  score: "number (0-100)"
+  next_status: "done | human-review | ai-review | doing"
+  findings:
+    - severity: "critical | major | minor | suggestion"
+      category: "security | quality | functionality | performance | tests | maintainability"
+      message: "string"
+      suggestion: "string (optional)"
+      file: "string"
+      line: "number (optional)"
+      confidence: "number (0-100)"
+  summary: "string"
+  highlights: "array of positive aspects"
+  recommendations: "array of suggested improvements"
+
+# Categories for detailed analysis
+categories:
+  security:
+    weight: 20
+    checks:
+      - "No hardcoded secrets or credentials"
+      - "No SQL injection patterns"
+      - "No XSS vulnerabilities"
+      - "Input validation present"
+      - "Proper authentication/authorization checks"
+      - "No sensitive data exposure"
+
+  quality:
+    weight: 20
+    checks:
+      - "Code follows project patterns"
+      - "No significant duplication"
+      - "Proper error handling"
+      - "Types are correct"
+      - "Clean, readable code"
+
+  functionality:
+    weight: 25
+    checks:
+      - "Acceptance criteria met"
+      - "Edge cases handled"
+      - "No regressions"
+      - "Business logic correct"
+
+  performance:
+    weight: 10
+    checks:
+      - "No N+1 queries"
+      - "No memory leaks"
+      - "Efficient algorithms"
+      - "Proper caching where needed"
+
+  tests:
+    weight: 15
+    checks:
+      - "Tests exist for new code"
+      - "Tests are passing"
+      - "Coverage adequate"
+      - "Edge cases tested"
+
+  maintainability:
+    weight: 10
+    checks:
+      - "Code is extensible"
+      - "Dependencies are appropriate"
+      - "No unnecessary complexity"
+      - "Documentation where needed"

@@ -1,0 +1,182 @@
+# Roobin Skills Catalog
+# Reference for the orchestrator to know which skill to delegate to
+
+skills:
+  # === PLANNING SKILLS ===
+  roobin-planner:
+    location: ~/.claude/skills/roobin-planner/SKILL.md
+    purpose: Create implementation plans with structured subtasks
+    triggers:
+      - Complex task needs breakdown
+      - User story needs technical design
+      - Architecture decisions required
+    commands:
+      - "*create-plan"
+      - "*design"
+    status_flow: backlog → planned
+    prompt_template: |
+      Ative a skill roobin-planner lendo ~/.claude/skills/roobin-planner/SKILL.md
+
+      Task: {task_description}
+      Project ID: {project_id}
+
+      Objetivo: Criar plano de implementação com subtasks estruturadas.
+      Salvar subtasks no Roobin MCP via manage_tasks.
+
+  # === IMPLEMENTATION SKILLS ===
+  roobin-dev:
+    location: ~/.claude/skills/roobin-dev/SKILL.md
+    purpose: Implement code changes following best practices
+    triggers:
+      - Code needs to be written
+      - Subtask ready for implementation
+      - Bug needs fixing
+    commands:
+      - "*develop {task-id}"
+      - "*implement"
+      - "*fix"
+    status_flow: planned → doing → ai-review
+    prompt_template: |
+      Ative a skill roobin-dev lendo ~/.claude/skills/roobin-dev/SKILL.md
+
+      Subtask ID: {subtask_id}
+      Descrição: {subtask_description}
+
+      Contexto:
+      - Arquivos relevantes: {files}
+      - Padrões a seguir: {patterns}
+
+      Critérios de sucesso:
+      - {criteria}
+
+      Ao finalizar, mover status para "ai-review" via manage_tasks.
+
+  # === REVIEW SKILLS ===
+  roobin-reviewer:
+    location: ~/.claude/skills/roobin-reviewer/SKILL.md
+    purpose: Code review with quality scoring
+    triggers:
+      - Implementation complete
+      - Task in "ai-review" status
+      - Code changes ready for review
+    commands:
+      - "*review {task-id}"
+      - "*score"
+    status_flow: ai-review → done OR human-review
+    scoring:
+      pass: ">= 90"
+      needs_work: "50-89"
+      fail: "< 50"
+    prompt_template: |
+      Ative a skill roobin-reviewer lendo ~/.claude/skills/roobin-reviewer/SKILL.md
+
+      *review {task_id}
+
+      Avaliar código implementado e gerar score 0-100.
+      Se score >= 90, mover para "done".
+      Se score < 50, gerar fix-request para roobin-dev.
+
+  # === DEPLOYMENT SKILLS ===
+  roobin-ops:
+    location: ~/.claude/skills/roobin-ops/SKILL.md
+    purpose: Git operations, PR creation, releases
+    triggers:
+      - Code ready to push
+      - PR needs to be created
+      - Release management
+    commands:
+      - "*pre-push"
+      - "*create-pr"
+      - "*release"
+    authorization: ONLY skill authorized for git push
+    prompt_template: |
+      Ative a skill roobin-ops lendo ~/.claude/skills/roobin-ops/SKILL.md
+
+      *pre-push
+
+      Se passar todos os checks, criar PR com as mudanças.
+
+  # === PRODUCT SKILLS ===
+  roobin-pm:
+    location: ~/.claude/skills/roobin-pm/SKILL.md (quando criado)
+    purpose: Backlog management, PRD creation
+    triggers:
+      - New feature needs PRD
+      - Backlog prioritization
+      - Sprint planning
+    commands:
+      - "*draft"
+      - "*prioritize"
+    status: pending (not yet migrated)
+
+  # === DOCUMENTATION SKILLS ===
+  roobin-docs:
+    location: ~/.claude/skills/roobin-docs/SKILL.md
+    purpose: Create and update documentation
+    triggers:
+      - Feature completed needs docs
+      - Bug fix affects documented behavior
+      - User requests documentation
+    commands:
+      - "*document {task-id}"
+      - "*update-docs"
+
+  # === TASK MANAGEMENT ===
+  roobin-tasks:
+    location: ~/.claude/skills/roobin-tasks/SKILL.md
+    purpose: Task and subtask management via Roobin MCP
+    triggers:
+      - Create new task
+      - Update task status
+      - Manage subtasks
+    commands:
+      - Direct MCP calls (manage_tasks, search_tasks)
+
+# === DELEGATION RULES ===
+delegation_rules:
+  token_optimization:
+    max_per_subagent: "~40k tokens"
+    strategy: "One task per subagent"
+
+  parallelization:
+    rule: "Parallelize independent tasks in same turn"
+    anti_pattern: "Multiple executors on same file"
+
+  context:
+    always_include:
+      - Task ID or full description
+      - Relevant files and locations
+      - Project patterns to follow
+      - Success criteria
+    never_include:
+      - Full conversation history
+      - Multiple tasks in same prompt
+
+  skill_activation:
+    pattern: "Ask subagent to ACTIVATE the skill"
+    example: |
+      Ative a skill {skill-name} lendo ~/.claude/skills/{skill-name}/SKILL.md
+      e execute o comando {command}
+
+# === FLOW PATTERNS ===
+flow_patterns:
+  feature:
+    - roobin-planner (if complex)
+    - roobin-dev (per subtask, parallelized)
+    - roobin-reviewer
+    - roobin-ops
+    - roobin-docs (optional)
+
+  bugfix:
+    - roobin-dev (with systematic-debugging)
+    - roobin-reviewer
+    - roobin-ops
+
+  refactor:
+    - roobin-planner
+    - roobin-dev (per subtask)
+    - roobin-reviewer
+    - roobin-ops
+
+  docs_only:
+    - roobin-docs
