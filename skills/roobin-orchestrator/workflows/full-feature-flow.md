@@ -72,26 +72,26 @@ User Request
 ### Delegation Prompt
 
 ```markdown
-Ative a skill roobin-planner lendo ~/.claude/skills/roobin-planner/SKILL.md
+Leia ~/.claude/skills/roobin-planner/SKILL.md e siga as instruções.
 
-## Task
-Criar plano de implementação para: {feature_description}
+## Comando
+Crie plano de implementação para: {feature_description}
 
-## Project
-- Project ID: 2d8b0db7-a0ca-4976-b526-b64442cc3831
+## Projeto
+- Project ID: {project_id}
 
-## Requirements
+## Requisitos
 {user_requirements}
 
-## Expected Output
+## Output Esperado
 1. Plano estruturado com subtasks
 2. Subtasks criadas no Roobin MCP
 3. Análise de dependências
 4. Lista de arquivos afetados
 
-## After Completion
-- Mover task para "planned"
-- Retornar lista de subtask IDs
+## Ao Finalizar
+- Mova a task para "planned"
+- Retorne lista de subtask IDs
 ```
 
 ### Expected Return
@@ -127,23 +127,25 @@ Task tool 2: [Subtask E - depends on B, C]
 ### Delegation Prompt per Subtask
 
 ```markdown
-Ative a skill roobin-dev lendo ~/.claude/skills/roobin-dev/SKILL.md
+Leia ~/.claude/skills/roobin-dev/SKILL.md e siga as instruções.
 
-## Subtask
-ID: {subtask_id}
-Descrição: {subtask_description}
+## Comando
+Implemente a subtask: {subtask_description}
 
-## Context
+## Identificadores
+- Subtask ID: {subtask_id}
+
+## Contexto
 - Arquivos: {files}
 - Padrões: {patterns}
 - Dependências: {deps}
 
-## Success Criteria
+## Critérios de Sucesso
 - [ ] {criteria}
 
-## After Completion
-- Status → "ai-review"
-- Retornar arquivos modificados
+## Ao Finalizar
+- Mova para status "ai-review"
+- Retorne arquivos modificados
 ```
 
 ## Phase 4: Review
@@ -153,10 +155,10 @@ Descrição: {subtask_description}
 ### Delegation Prompt
 
 ```markdown
-Ative a skill roobin-reviewer lendo ~/.claude/skills/roobin-reviewer/SKILL.md
+Leia ~/.claude/skills/roobin-reviewer/SKILL.md e siga as instruções.
 
-## Task
-Review implementação da feature: {task_id}
+## Comando
+Revise a implementação da feature: {task_id}
 
 ## Arquivos Modificados
 {list_of_modified_files}
@@ -164,7 +166,7 @@ Review implementação da feature: {task_id}
 ## Tipo
 Feature implementation
 
-## Expected Output
+## Output Esperado
 - Score 0-100
 - Issues encontradas
 - Sugestões
@@ -197,10 +199,10 @@ Feature implementation
 ### Delegation Prompt
 
 ```markdown
-Ative a skill roobin-ops lendo ~/.claude/skills/roobin-ops/SKILL.md
+Leia ~/.claude/skills/roobin-ops/SKILL.md e siga as instruções.
 
-## Task
-Pre-push e criar PR para feature: {feature_name}
+## Comando
+Execute pre-push e crie PR para: {feature_name}
 
 ## Mudanças
 - Task ID: {task_id}
@@ -211,8 +213,8 @@ Pre-push e criar PR para feature: {feature_name}
 - Base: main
 - Title: feat: {feature_title}
 
-## After Completion
-- Retornar URL do PR
+## Ao Finalizar
+- Retorne URL do PR
 ```
 
 ### Success Criteria

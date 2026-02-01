@@ -135,7 +135,7 @@ For Roobin Web tasks, always include:
 ```markdown
 ## Project Context
 - Project: Roobin Web
-- Project ID (Roobin MCP): 2d8b0db7-a0ca-4976-b526-b64442cc3831
+- Project ID (Roobin MCP): {project_id}
 - Supabase Project: sqkbqdwmxhsqspaiztgd
 
 ## Tech Stack
