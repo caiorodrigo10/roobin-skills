@@ -72,26 +72,26 @@ User Request
 ### Delegation Prompt
 
 ```markdown
-Leia ~/.claude/skills/roobin-planner/SKILL.md e siga as instruções.
+Read ~/.claude/skills/roobin-planner/SKILL.md and follow the instructions.
 
-## Comando
-Crie plano de implementação para: {feature_description}
+## Command
+Create implementation plan for: {feature_description}
 
-## Projeto
+## Project
 - Project ID: {project_id}
 
-## Requisitos
+## Requirements
 {user_requirements}
 
-## Output Esperado
-1. Plano estruturado com subtasks
-2. Subtasks criadas no Roobin MCP
-3. Análise de dependências
-4. Lista de arquivos afetados
+## Expected Output
+1. Structured plan with subtasks
+2. Subtasks created in Roobin MCP
+3. Dependency analysis
+4. List of affected files
 
-## Ao Finalizar
-- Mova a task para "planned"
-- Retorne lista de subtask IDs
+## On Completion
+- Move task to "planned"
+- Return list of subtask IDs
 ```
 
 ### Expected Return
@@ -127,25 +127,25 @@ Task tool 2: [Subtask E - depends on B, C]
 ### Delegation Prompt per Subtask
 
 ```markdown
-Leia ~/.claude/skills/roobin-dev/SKILL.md e siga as instruções.
+Read ~/.claude/skills/roobin-dev/SKILL.md and follow the instructions.
 
-## Comando
-Implemente a subtask: {subtask_description}
+## Command
+Implement subtask: {subtask_description}
 
-## Identificadores
+## Identifiers
 - Subtask ID: {subtask_id}
 
-## Contexto
-- Arquivos: {files}
-- Padrões: {patterns}
-- Dependências: {deps}
+## Context
+- Files: {files}
+- Patterns: {patterns}
+- Dependencies: {deps}
 
-## Critérios de Sucesso
+## Success Criteria
 - [ ] {criteria}
 
-## Ao Finalizar
-- Mova para status "ai-review"
-- Retorne arquivos modificados
+## On Completion
+- Move to status "ai-review"
+- Return modified files
 ```
 
 ## Phase 4: Review
@@ -155,21 +155,21 @@ Implemente a subtask: {subtask_description}
 ### Delegation Prompt
 
 ```markdown
-Leia ~/.claude/skills/roobin-reviewer/SKILL.md e siga as instruções.
+Read ~/.claude/skills/roobin-reviewer/SKILL.md and follow the instructions.
 
-## Comando
-Revise a implementação da feature: {task_id}
+## Command
+Review feature implementation: {task_id}
 
-## Arquivos Modificados
+## Modified Files
 {list_of_modified_files}
 
-## Tipo
+## Type
 Feature implementation
 
-## Output Esperado
+## Expected Output
 - Score 0-100
-- Issues encontradas
-- Sugestões
+- Issues found
+- Suggestions
 ```
 
 ### Score Handling
@@ -199,22 +199,22 @@ Feature implementation
 ### Delegation Prompt
 
 ```markdown
-Leia ~/.claude/skills/roobin-ops/SKILL.md e siga as instruções.
+Read ~/.claude/skills/roobin-ops/SKILL.md and follow the instructions.
 
-## Comando
-Execute pre-push e crie PR para: {feature_name}
+## Command
+Run pre-push and create PR for: {feature_name}
 
-## Mudanças
+## Changes
 - Task ID: {task_id}
-- Arquivos: {modified_files}
+- Files: {modified_files}
 
 ## PR Info
 - Branch: feature/{feature_slug}
 - Base: main
 - Title: feat: {feature_title}
 
-## Ao Finalizar
-- Retorne URL do PR
+## On Completion
+- Return PR URL
 ```
 
 ### Success Criteria
@@ -229,28 +229,28 @@ Execute pre-push e crie PR para: {feature_name}
 ### Report to User
 
 ```markdown
-## Feature Implementada ✅
+## Feature Implemented ✅
 
 **{feature_name}**
 
-### Resumo
-- {n} subtasks completadas
-- {m} arquivos modificados
-- Score de review: {score}/100
+### Summary
+- {n} subtasks completed
+- {m} files modified
+- Review score: {score}/100
 
 ### PR
 {pr_url}
 
-### Próximos Passos
-- Aguardar CI/CD
-- Code review por humano
-- Merge quando aprovado
+### Next Steps
+- Wait for CI/CD
+- Human code review
+- Merge when approved
 ```
 
 ## Complete Example
 
 ### User Request
-"Implementar filtro de status no Kanban"
+"Implement status filter in Kanban"
 
 ### Phase 1: Analyze
 - Type: Feature
@@ -259,9 +259,9 @@ Execute pre-push e crie PR para: {feature_name}
 
 ### Phase 2: Plan
 Delegate to roobin-planner:
-- Subtask A: Componente FilterDropdown
-- Subtask B: Hook useStatusFilter
-- Subtask C: Integração no KanbanBoard
+- Subtask A: FilterDropdown component
+- Subtask B: useStatusFilter hook
+- Subtask C: KanbanBoard integration
 - Dependencies: C depends on A, B
 
 ### Phase 3: Execute
@@ -285,4 +285,4 @@ Turn 3:
 - PR created: github.com/repo/pull/123
 
 ### Phase 6: Report
-"Feature implementada. PR: github.com/repo/pull/123"
+"Feature implemented. PR: github.com/repo/pull/123"

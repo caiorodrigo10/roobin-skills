@@ -1,181 +1,181 @@
 # Delegation Prompt Template
 
-## Formato de Delegação com Comandos Imperativos
+## Delegation Format with Imperative Commands
 
-Use este template ao delegar para skills Roobin via Task tool. **Sempre use comandos imperativos.**
+Use this template when delegating to Roobin skills via Task tool. **Always use imperative commands.**
 
 ```markdown
-Leia ~/.claude/skills/{skill-name}/SKILL.md e siga as instruções.
+Read ~/.claude/skills/{skill-name}/SKILL.md and follow the instructions.
 
-## Comando
-{VERBO IMPERATIVO}: {descrição específica da ação}
+## Command
+{IMPERATIVE VERB}: {specific action description}
 
-## Identificadores
+## Identifiers
 - Task/Subtask ID: {id}
 - Project ID: {project_id}
 
-## Contexto
-- Arquivos relevantes: {file_paths}
-- Padrões a seguir: {existing_patterns}
-- Dependências: {dependencies}
+## Context
+- Relevant files: {file_paths}
+- Patterns to follow: {existing_patterns}
+- Dependencies: {dependencies}
 
-## Critérios de Sucesso
+## Success Criteria
 - [ ] {criterion_1}
 - [ ] {criterion_2}
 
-## Ao Finalizar
-- Atualize o status da task via manage_tasks para "{next_status}"
-- Retorne resumo das mudanças
-- Liste arquivos criados/modificados
+## On Completion
+- Update task status via manage_tasks to "{next_status}"
+- Return summary of changes
+- List files created/modified
 ```
 
-## Verbos Imperativos por Skill
+## Imperative Verbs by Skill
 
-| Skill | Verbos | Exemplo |
-|-------|--------|---------|
-| `roobin-planner` | Crie, Planeje, Defina | "Crie plano de implementação para X" |
-| `roobin-dev` | Implemente, Corrija, Refatore | "Implemente o componente Y" |
-| `roobin-reviewer` | Revise, Analise, Avalie | "Revise os arquivos modificados" |
-| `roobin-ops` | Execute, Publique, Crie | "Execute pre-push e crie PR" |
-| `roobin-pm` | Crie, Priorize, Valide | "Crie PRD para a feature Z" |
+| Skill | Verbs | Example |
+|-------|-------|---------|
+| `roobin-planner` | Create, Plan, Define | "Create implementation plan for X" |
+| `roobin-dev` | Implement, Fix, Refactor | "Implement component Y" |
+| `roobin-reviewer` | Review, Analyze, Evaluate | "Review modified files" |
+| `roobin-ops` | Run, Publish, Create | "Run pre-push and create PR" |
+| `roobin-pm` | Create, Prioritize, Validate | "Create PRD for feature Z" |
 
-## Templates por Skill
+## Skill-Specific Templates
 
 ### roobin-planner
 
 ```markdown
-Leia ~/.claude/skills/roobin-planner/SKILL.md e siga as instruções.
+Read ~/.claude/skills/roobin-planner/SKILL.md and follow the instructions.
 
-## Comando
-Crie plano de implementação para: {task_description}
+## Command
+Create implementation plan for: {task_description}
 
-## Projeto
+## Project
 - Project ID: {project_id}
-- Task ID: {task_id} (se existente)
+- Task ID: {task_id} (if existing)
 
-## Requisitos
+## Requirements
 {requirements_summary}
 
-## Output Esperado
-- Plano estruturado com subtasks
-- Subtasks criadas no Roobin MCP via manage_tasks
-- Análise de dependências entre subtasks
-- Estimativa de complexidade por subtask
+## Expected Output
+- Structured plan with subtasks
+- Subtasks created in Roobin MCP via manage_tasks
+- Dependency analysis between subtasks
+- Complexity estimate per subtask
 
-## Ao Finalizar
-- Mova a task principal para status "planned"
-- Retorne lista de subtask IDs criadas
+## On Completion
+- Move main task to status "planned"
+- Return list of created subtask IDs
 ```
 
 ### roobin-dev
 
 ```markdown
-Leia ~/.claude/skills/roobin-dev/SKILL.md e siga as instruções.
+Read ~/.claude/skills/roobin-dev/SKILL.md and follow the instructions.
 
-## Comando
-Implemente: {subtask_description}
+## Command
+Implement: {subtask_description}
 
-## Identificadores
+## Identifiers
 - Subtask ID: {subtask_id}
 - Parent Task ID: {parent_task_id}
 - Project ID: {project_id}
 
-## Contexto
-- Arquivos a modificar: {files_to_modify}
-- Arquivos de referência: {reference_files}
-- Padrões existentes: {patterns}
+## Context
+- Files to modify: {files_to_modify}
+- Reference files: {reference_files}
+- Existing patterns: {patterns}
 
-## Detalhes Técnicos
+## Technical Details
 {technical_requirements}
 
-## Critérios de Sucesso
+## Success Criteria
 - [ ] {functional_criterion}
-- [ ] Código segue padrões do projeto
-- [ ] Sem erros de TypeScript (pnpm check:types)
-- [ ] Sem erros de lint (pnpm lint)
+- [ ] Code follows project patterns
+- [ ] No TypeScript errors (pnpm check:types)
+- [ ] No lint errors (pnpm lint)
 
-## Ao Finalizar
-- Mova a subtask para status "ai-review"
-- Retorne lista de arquivos modificados
-- Inclua resumo das mudanças
+## On Completion
+- Move subtask to status "ai-review"
+- Return list of modified files
+- Include summary of changes
 ```
 
 ### roobin-reviewer
 
 ```markdown
-Leia ~/.claude/skills/roobin-reviewer/SKILL.md e siga as instruções.
+Read ~/.claude/skills/roobin-reviewer/SKILL.md and follow the instructions.
 
-## Comando
-Revise o código da task: {task_id}
+## Command
+Review code for task: {task_id}
 
-## Escopo
-- Arquivos modificados: {modified_files}
-- Tipo de mudança: {change_type} (feature/bugfix/refactor)
+## Scope
+- Modified files: {modified_files}
+- Change type: {change_type} (feature/bugfix/refactor)
 
-## Critérios de Review
-- Qualidade do código
-- Segurança (OWASP top 10)
+## Review Criteria
+- Code quality
+- Security (OWASP top 10)
 - Performance
-- Manutenibilidade
-- Aderência aos padrões do projeto
+- Maintainability
+- Adherence to project patterns
 
-## Output Esperado
+## Expected Output
 - Score 0-100
-- Lista de issues encontradas (se houver)
-- Sugestões de melhoria
+- List of issues found (if any)
+- Improvement suggestions
 
-## Após Review
-- Se score >= 90: mova para "done"
-- Se score 50-89: crie fix-request, mantenha em "ai-review"
-- Se score < 50: mova para "human-review"
+## After Review
+- If score >= 90: move to "done"
+- If score 50-89: create fix-request, keep in "ai-review"
+- If score < 50: move to "human-review"
 ```
 
 ### roobin-ops
 
 ```markdown
-Leia ~/.claude/skills/roobin-ops/SKILL.md e siga as instruções.
+Read ~/.claude/skills/roobin-ops/SKILL.md and follow the instructions.
 
-## Comando
-Execute pre-push e crie PR para: {feature_name}
+## Command
+Run pre-push and create PR for: {feature_name}
 
-## Mudanças
+## Changes
 - Task ID: {task_id}
-- Arquivos modificados: {modified_files}
-- Descrição: {change_description}
+- Modified files: {modified_files}
+- Description: {change_description}
 
 ## Pre-Push Checklist
-- [ ] pnpm check:types passa
-- [ ] pnpm lint passa
-- [ ] pnpm build passa
-- [ ] Testes passam (se aplicável)
+- [ ] pnpm check:types passes
+- [ ] pnpm lint passes
+- [ ] pnpm build passes
+- [ ] Tests pass (if applicable)
 
-## Detalhes do PR
+## PR Details
 - Branch: {branch_name}
 - Base: {base_branch}
 - Title: {pr_title}
 
-## Ao Finalizar
-- Retorne URL do PR criado
-- Confirme que push foi bem sucedido
+## On Completion
+- Return created PR URL
+- Confirm push was successful
 ```
 
-## Regras de Contexto
+## Context Rules
 
-### Sempre Incluir
-1. **Comando para ler SKILL.md** - caminho completo
-2. **Verbo imperativo** - ação clara e específica
-3. **Identificação da task** - ID ou descrição completa
-4. **Arquivos relevantes** - o que ler/modificar
-5. **Critérios de sucesso** - como saber quando terminou
-6. **Próximo status** - qual status definir ao completar
+### Always Include
+1. **Command to read SKILL.md** - full path
+2. **Imperative verb** - clear and specific action
+3. **Task identification** - ID or complete description
+4. **Relevant files** - what to read/modify
+5. **Success criteria** - how to know when done
+6. **Next status** - what status to set on completion
 
-### Nunca Incluir
-1. Histórico completo da conversa
-2. Múltiplas tasks não relacionadas
-3. Instruções vagas ("melhore isso")
-4. Suposições sobre o que o subagent sabe
+### Never Include
+1. Full conversation history
+2. Multiple unrelated tasks
+3. Vague instructions ("make it better")
+4. Assumptions about what subagent knows
 
-### Budget de Tokens
-- Mantenha o prompt de delegação abaixo de 500 tokens
-- Foque em informação acionável
-- Referencie arquivos ao invés de colar conteúdo
+### Token Budget
+- Keep delegation prompt under 500 tokens
+- Focus on actionable information
+- Reference files instead of pasting content

@@ -47,13 +47,13 @@ Do NOT use when:
 
 ## Skills Catalog
 
-| Skill | When to Delegate | Comando Imperativo |
+| Skill | When to Delegate | Imperative Command |
 |-------|------------------|-------------------|
-| `roobin-planner` | Complex task needs structured plan | "Leia ~/.claude/skills/roobin-planner/SKILL.md. Crie plano para X." |
-| `roobin-dev` | Implement code changes | "Leia ~/.claude/skills/roobin-dev/SKILL.md. Implemente X." |
-| `roobin-reviewer` | Code review after implementation | "Leia ~/.claude/skills/roobin-reviewer/SKILL.md. Revise X." |
-| `roobin-ops` | Git push, PR, releases | "Leia ~/.claude/skills/roobin-ops/SKILL.md. Execute pre-push e crie PR." |
-| `roobin-pm` | Backlog management, PRD | "Leia ~/.claude/skills/roobin-pm/SKILL.md. Crie PRD para X." |
+| `roobin-planner` | Complex task needs structured plan | "Read ~/.claude/skills/roobin-planner/SKILL.md. Create plan for X." |
+| `roobin-dev` | Implement code changes | "Read ~/.claude/skills/roobin-dev/SKILL.md. Implement X." |
+| `roobin-reviewer` | Code review after implementation | "Read ~/.claude/skills/roobin-reviewer/SKILL.md. Review X." |
+| `roobin-ops` | Git push, PR, releases | "Read ~/.claude/skills/roobin-ops/SKILL.md. Run pre-push and create PR." |
+| `roobin-pm` | Backlog management, PRD | "Read ~/.claude/skills/roobin-pm/SKILL.md. Create PRD for X." |
 
 **CRITICAL:** Only `roobin-ops` is authorized to push to remote repository.
 
@@ -83,30 +83,30 @@ Turn 4: code-reviewer
 
 ## Context Template for Delegation
 
-**CRITICAL:** Subagents have NO conversation history. Use comandos imperativos:
+**CRITICAL:** Subagents have NO conversation history. Use imperative commands:
 
 ```markdown
-Leia ~/.claude/skills/{skill-name}/SKILL.md e siga as instruções.
+Read ~/.claude/skills/{skill-name}/SKILL.md and follow the instructions.
 
-## Comando
-{imperativo: Implemente/Crie/Revise/Execute} {task_description}
+## Command
+{imperative: Implement/Create/Review/Execute} {task_description}
 
-## Identificadores
+## Identifiers
 - Task/Subtask ID: {id}
 - Project ID: {project_id}
 
-## Contexto
-- Arquivos relevantes: {file_paths}
-- Padrões a seguir: {existing_patterns}
-- Dependências: {dependencies}
+## Context
+- Relevant files: {file_paths}
+- Patterns to follow: {existing_patterns}
+- Dependencies: {dependencies}
 
-## Critérios de Sucesso
+## Success Criteria
 - {criterion_1}
 - {criterion_2}
 
-## Ao Finalizar
-- Atualize o status da task via manage_tasks
-- Retorne resumo das mudanças
+## On Completion
+- Update task status via manage_tasks
+- Return summary of changes
 ```
 
 ## Common Rationalizations
@@ -149,9 +149,9 @@ You are violating the Iron Law if:
 
 ```markdown
 1. Delegate to roobin-planner:
-   "Leia ~/.claude/skills/roobin-planner/SKILL.md.
-    Crie plano de implementação para '{task_description}'.
-    Gere subtasks no Roobin MCP via manage_tasks."
+   "Read ~/.claude/skills/roobin-planner/SKILL.md.
+    Create implementation plan for '{task_description}'.
+    Generate subtasks in Roobin MCP via manage_tasks."
 
 2. Wait for return (list of subtasks with IDs)
 
@@ -165,9 +165,9 @@ You are violating the Iron Law if:
 ```markdown
 1. Group independent subtasks
 2. Delegate in parallel:
-   Task tool 1: "Leia ~/.claude/skills/roobin-dev/SKILL.md. Implemente subtask {A}. [context]"
-   Task tool 2: "Leia ~/.claude/skills/roobin-dev/SKILL.md. Implemente subtask {B}. [context]"
-   Task tool 3: "Leia ~/.claude/skills/roobin-dev/SKILL.md. Implemente subtask {C}. [context]"
+   Task tool 1: "Read ~/.claude/skills/roobin-dev/SKILL.md. Implement subtask {A}. [context]"
+   Task tool 2: "Read ~/.claude/skills/roobin-dev/SKILL.md. Implement subtask {B}. [context]"
+   Task tool 3: "Read ~/.claude/skills/roobin-dev/SKILL.md. Implement subtask {C}. [context]"
 
 3. Wait for returns
 
@@ -178,7 +178,7 @@ You are violating the Iron Law if:
 
 ```markdown
 1. Delegate to roobin-reviewer:
-   "Leia ~/.claude/skills/roobin-reviewer/SKILL.md. Revise a task {task-id}."
+   "Read ~/.claude/skills/roobin-reviewer/SKILL.md. Review task {task-id}."
 
 2. If score >= 90 → proceed to Phase 5
 3. If score 50-89 → create fix-request, back to Phase 3
@@ -189,7 +189,7 @@ You are violating the Iron Law if:
 
 ```markdown
 1. Delegate to roobin-ops:
-   "Leia ~/.claude/skills/roobin-ops/SKILL.md. Execute pre-push e crie PR."
+   "Read ~/.claude/skills/roobin-ops/SKILL.md. Run pre-push and create PR."
 
 2. If pre-push passes → create PR
 3. If fails → fix issues, repeat
