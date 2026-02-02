@@ -138,32 +138,143 @@ agent_collaboration:
 
 ---
 
-## The Development Flow
+## The Development Flow (GRANULAR POR SUBTASK)
+
+**REGRA DE OURO: Atualizar status INDIVIDUALMENTE conforme trabalha.**
 
 ```
-1. Get Task from Roobin MCP
+1. INÍCIO - Buscar Task + Subtasks
    Tool: mcp__roobin__search_tasks
    Params: { project_id: "xxx", task_id: "xxx", include_subtasks: true }
 
-2. Start Implementation
+   -> Anotar IDs de todas as subtasks
+   -> Subtasks permanecem em "backlog" até serem trabalhadas
+
+2. INICIAR TASK PAI
    Tool: mcp__roobin__manage_tasks
-   Params: { action: "update", updates: [{ task_id: "xxx", status: "doing" }] }
-   -> Also update subtasks to "doing" as you work on each
+   Params: { action: "update", updates: [{ task_id: "<task-pai>", status: "doing" }] }
 
-3. Implement
-   -> Write code following existing patterns
-   -> Write tests
-   -> Run validations (pnpm check:types, pnpm lint)
+   -> APENAS a task pai vai para "doing"
+   -> Subtasks continuam em "backlog"
 
-4. Self-Critique
-   -> Use self-critique-checklist before completion
-   -> Fix any issues found
+3. PARA CADA SUBTASK (executar sequencialmente):
 
-5. Complete (MANDATORY EXIT CHECKLIST)
-   -> Run EXIT CHECKLIST below
-   -> Update task AND ALL subtasks to "ai-review"
-   -> create_comment with summary
-   -> Notify: "Ready for roobin-reviewer"
+   3a. ANTES de implementar a subtask:
+       Tool: mcp__roobin__manage_tasks
+       Params: { action: "update", updates: [{ task_id: "<subtask-X>", status: "doing" }] }
+
+   3b. Implementar o código da subtask
+       -> Escrever código seguindo padrões existentes
+       -> Testar localmente
+
+   3c. APÓS implementar a subtask:
+       Tool: mcp__roobin__manage_tasks
+       Params: { action: "update", updates: [{ task_id: "<subtask-X>", status: "ai-review" }] }
+
+   -> REPETIR 3a-3c para CADA subtask
+
+4. FINALIZAÇÃO (após TODAS subtasks estarem "ai-review")
+   -> Run EXIT CHECKLIST abaixo
+   -> Task pai → "ai-review"
+   -> Adicionar comentário
+   -> Notificar: "Ready for roobin-reviewer"
+```
+
+---
+
+## FLUXO DE STATUS POR SUBTASK
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    SUBTASK STATUS FLOW                       │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  Task pai: backlog → doing (início)                         │
+│       │                                                     │
+│       ▼                                                     │
+│  Subtask 1: backlog → doing → ai-review                     │
+│       │                                                     │
+│       ▼                                                     │
+│  Subtask 2: backlog → doing → ai-review                     │
+│       │                                                     │
+│       ▼                                                     │
+│  Subtask 3: backlog → doing → ai-review                     │
+│       │                                                     │
+│       ▼                                                     │
+│  (... todas subtasks em ai-review ...)                      │
+│       │                                                     │
+│       ▼                                                     │
+│  Task pai: doing → ai-review                                │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## EXEMPLO PRÁTICO
+
+```javascript
+// 1. Buscar task com subtasks
+const task = await mcp__roobin__search_tasks({
+  project_id: "xxx",
+  task_id: "task-123"
+});
+// task.subtasks = [subtask-A, subtask-B, subtask-C]
+
+// 2. Iniciar task pai
+await mcp__roobin__manage_tasks({
+  project_id: "xxx",
+  action: "update",
+  updates: [{ task_id: "task-123", status: "doing" }]
+});
+
+// 3. Para cada subtask:
+
+// --- Subtask A ---
+await mcp__roobin__manage_tasks({
+  project_id: "xxx",
+  action: "update",
+  updates: [{ task_id: "subtask-A", status: "doing" }]
+});
+// ... implementar subtask A ...
+await mcp__roobin__manage_tasks({
+  project_id: "xxx",
+  action: "update",
+  updates: [{ task_id: "subtask-A", status: "ai-review" }]
+});
+
+// --- Subtask B ---
+await mcp__roobin__manage_tasks({
+  project_id: "xxx",
+  action: "update",
+  updates: [{ task_id: "subtask-B", status: "doing" }]
+});
+// ... implementar subtask B ...
+await mcp__roobin__manage_tasks({
+  project_id: "xxx",
+  action: "update",
+  updates: [{ task_id: "subtask-B", status: "ai-review" }]
+});
+
+// --- Subtask C ---
+await mcp__roobin__manage_tasks({
+  project_id: "xxx",
+  action: "update",
+  updates: [{ task_id: "subtask-C", status: "doing" }]
+});
+// ... implementar subtask C ...
+await mcp__roobin__manage_tasks({
+  project_id: "xxx",
+  action: "update",
+  updates: [{ task_id: "subtask-C", status: "ai-review" }]
+});
+
+// 4. Finalizar task pai
+await mcp__roobin__manage_tasks({
+  project_id: "xxx",
+  action: "update",
+  updates: [{ task_id: "task-123", status: "ai-review" }]
+});
 ```
 
 ---
@@ -172,7 +283,7 @@ agent_collaboration:
 
 **VOCÊ NÃO PODE RETORNAR SEM COMPLETAR ESTE CHECKLIST.**
 
-### PASSO 1: Buscar Task + Subtasks (OBTER IDs)
+### PASSO 1: Verificar Subtasks
 
 ```
 Tool: mcp__roobin__search_tasks
@@ -180,11 +291,12 @@ Params:
   project_id: "6ae1dc32-01c1-4100-8c8c-d2519ac5f95d"
   task_id: "<task-id-recebido>"
 
-RESULTADO: Você receberá a task COM array "subtasks" contendo os IDs.
-ANOTAR: Todos os IDs das subtasks para usar no próximo passo.
+VERIFICAR:
+- TODAS subtasks devem estar em "ai-review"
+- Se alguma NÃO está, atualizar individualmente ANTES de continuar
 ```
 
-### PASSO 2: Atualizar Task + TODAS Subtasks
+### PASSO 2: Atualizar Task Pai
 
 ```
 Tool: mcp__roobin__manage_tasks
@@ -194,16 +306,9 @@ Params:
   updates:
     - task_id: "<parent-task-id>"
       status: "ai-review"
-    - task_id: "<subtask-1-id>"
-      status: "ai-review"
-    - task_id: "<subtask-2-id>"
-      status: "ai-review"
-    - task_id: "<subtask-3-id>"
-      status: "ai-review"
-    # INCLUIR TODAS AS SUBTASKS - NÃO PULAR NENHUMA
 ```
 
-### PASSO 3: Verificar Atualização
+### PASSO 3: Verificar Atualização Final
 
 ```
 Tool: mcp__roobin__search_tasks
@@ -215,7 +320,7 @@ VERIFICAR:
 - task.status == "ai-review" ✓
 - CADA subtask.status == "ai-review" ✓
 
-SE ALGUM STATUS NÃO FOI ATUALIZADO → REPETIR PASSO 2
+SE ALGUM STATUS INCORRETO → CORRIGIR ANTES DE RETORNAR
 ```
 
 ### PASSO 4: Adicionar Comentário
@@ -240,20 +345,41 @@ exit_checklist:
     - [ ] No console.log or debug artifacts
     - [ ] No hardcoded values or secrets
 
-  status_updates_OBRIGATORIO:
-    - [ ] Executei PASSO 1 (buscar task + subtasks)
-    - [ ] Anotei TODOS os IDs das subtasks
-    - [ ] Executei PASSO 2 (update task + TODAS subtasks)
-    - [ ] Executei PASSO 3 (verificar se TODAS estão ai-review)
-    - [ ] Executei PASSO 4 (adicionar comentário)
+  status_updates_GRANULAR:
+    - [ ] Task pai está "doing" desde o início
+    - [ ] CADA subtask foi: backlog → doing → ai-review (individualmente)
+    - [ ] Task pai está "ai-review" (após todas subtasks)
+    - [ ] Comentário foi adicionado
 
   verification:
     - [ ] Task pai está "ai-review"
     - [ ] TODAS subtasks estão "ai-review"
-    - [ ] Comentário foi adicionado
+    - [ ] Nenhuma subtask ficou em "backlog" ou "doing"
 ```
 
 **⚠️ BLOQUEANTE: Se QUALQUER subtask não estiver "ai-review", NÃO retornar.**
+
+---
+
+## ANTI-PATTERNS (NÃO FAZER)
+
+```yaml
+errado_1:
+  descricao: "Atualizar todas subtasks para doing no início"
+  problema: "Não reflete progresso real"
+
+errado_2:
+  descricao: "Batch update de todas subtasks no final"
+  problema: "Perde tracking de progresso durante execução"
+
+errado_3:
+  descricao: "Nunca atualizar subtasks, só task pai"
+  problema: "Subtasks ficam em backlog eternamente"
+
+correto:
+  descricao: "Atualizar UMA subtask por vez: doing ao iniciar, ai-review ao terminar"
+  beneficio: "Visibilidade real do progresso"
+```
 
 ## Commands
 
