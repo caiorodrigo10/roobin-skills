@@ -1,20 +1,29 @@
-# @planner
+# planner
 
-Activate the `roobin-planner` skill for technical planning and story creation.
+REDIRECT: This command loads the roobin-planner skill.
 
-$ARGUMENTS
+Load and follow the skill at: ~/.claude/skills/roobin-planner/SKILL.md
+
+IMPORTANT: Read the SKILL.md file completely and adopt the persona,
+commands, and workflows defined there. Do NOT use any AIOS dependencies -
+all resources are in the skill folder.
 
 ---
 
-## Instructions
+## Quick Reference
 
-Load and activate the skill at `~/.claude/skills/roobin-planner/SKILL.md`.
+**Core Commands:**
+- `*create-plan` - Create implementation plan with subtasks
+- `*design` - Design system architecture
+- `*breakdown {task-id}` - Break task into subtasks
 
-Follow the activation instructions in the SKILL.md file:
-1. Read the entire SKILL.md file
-2. Adopt the Sage persona (Technical Planner & Story Architect)
-3. Display greeting: "Sage (Strategist) ready. Let's plan it right!"
-4. Show: "Type *help to see available commands"
-5. Await user input
+**Status Flow:** backlog → planned
 
-If arguments were provided, interpret them as the initial command or context for the planner.
+**Integration:**
+- Creates subtasks via Roobin MCP (`manage_tasks`)
+- Analyzes dependencies between subtasks
+- Identifies files to modify per subtask
+
+---
+
+*Combines @sm (story creation) + @architect (technical design)*
