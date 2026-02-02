@@ -168,9 +168,69 @@ agent_collaboration:
 
 ---
 
-## EXIT CHECKLIST (MANDATORY)
+## EXIT CHECKLIST (MANDATORY - BLOQUEANTE)
 
-**Before returning "implementation complete", you MUST:**
+**VOCÊ NÃO PODE RETORNAR SEM COMPLETAR ESTE CHECKLIST.**
+
+### PASSO 1: Buscar Task + Subtasks (OBTER IDs)
+
+```
+Tool: mcp__roobin__search_tasks
+Params:
+  project_id: "6ae1dc32-01c1-4100-8c8c-d2519ac5f95d"
+  task_id: "<task-id-recebido>"
+
+RESULTADO: Você receberá a task COM array "subtasks" contendo os IDs.
+ANOTAR: Todos os IDs das subtasks para usar no próximo passo.
+```
+
+### PASSO 2: Atualizar Task + TODAS Subtasks
+
+```
+Tool: mcp__roobin__manage_tasks
+Params:
+  project_id: "6ae1dc32-01c1-4100-8c8c-d2519ac5f95d"
+  action: "update"
+  updates:
+    - task_id: "<parent-task-id>"
+      status: "ai-review"
+    - task_id: "<subtask-1-id>"
+      status: "ai-review"
+    - task_id: "<subtask-2-id>"
+      status: "ai-review"
+    - task_id: "<subtask-3-id>"
+      status: "ai-review"
+    # INCLUIR TODAS AS SUBTASKS - NÃO PULAR NENHUMA
+```
+
+### PASSO 3: Verificar Atualização
+
+```
+Tool: mcp__roobin__search_tasks
+Params:
+  project_id: "6ae1dc32-01c1-4100-8c8c-d2519ac5f95d"
+  task_id: "<parent-task-id>"
+
+VERIFICAR:
+- task.status == "ai-review" ✓
+- CADA subtask.status == "ai-review" ✓
+
+SE ALGUM STATUS NÃO FOI ATUALIZADO → REPETIR PASSO 2
+```
+
+### PASSO 4: Adicionar Comentário
+
+```
+Tool: mcp__roobin__create_comment
+Params:
+  task_id: "<parent-task-id>"
+  content: "## Implementation Complete\n\n### Changes\n- ..."
+  author: "Dex (Builder)"
+```
+
+---
+
+### CHECKLIST FINAL (Marcar TODOS antes de retornar)
 
 ```yaml
 exit_checklist:
@@ -180,44 +240,20 @@ exit_checklist:
     - [ ] No console.log or debug artifacts
     - [ ] No hardcoded values or secrets
 
-  status_updates:
-    - [ ] Task status updated to "ai-review"
-    - [ ] ALL subtasks status updated to "ai-review"
-    - [ ] Comment added with summary of changes
+  status_updates_OBRIGATORIO:
+    - [ ] Executei PASSO 1 (buscar task + subtasks)
+    - [ ] Anotei TODOS os IDs das subtasks
+    - [ ] Executei PASSO 2 (update task + TODAS subtasks)
+    - [ ] Executei PASSO 3 (verificar se TODAS estão ai-review)
+    - [ ] Executei PASSO 4 (adicionar comentário)
 
   verification:
-    - [ ] Verified status via search_tasks AFTER update
-    - [ ] If status not updated, retry manage_tasks
-
-mcp_tools_used:
-  update_status:
-    tool: mcp__roobin__manage_tasks
-    params:
-      project_id: "6ae1dc32-01c1-4100-8c8c-d2519ac5f95d"
-      action: "update"
-      updates:
-        - task_id: "parent-task-uuid"
-          status: "ai-review"
-        - task_id: "subtask-1-uuid"
-          status: "ai-review"
-        # ... all subtasks
-
-  verify_status:
-    tool: mcp__roobin__search_tasks
-    params:
-      project_id: "6ae1dc32-01c1-4100-8c8c-d2519ac5f95d"
-      task_id: "parent-task-uuid"
-      include_subtasks: true
-
-  add_comment:
-    tool: mcp__roobin__create_comment
-    params:
-      task_id: "parent-task-uuid"
-      content: "## Implementation Complete\n\n### Changes\n- ..."
-      author: "Dex (Builder)"
+    - [ ] Task pai está "ai-review"
+    - [ ] TODAS subtasks estão "ai-review"
+    - [ ] Comentário foi adicionado
 ```
 
-**If ANY item is not checked, DO NOT return "complete".**
+**⚠️ BLOQUEANTE: Se QUALQUER subtask não estiver "ai-review", NÃO retornar.**
 
 ## Commands
 
