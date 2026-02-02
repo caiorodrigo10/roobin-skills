@@ -242,7 +242,9 @@ dependencies:
 
 ```
 1. GATHER CONTEXT
-   |-- mcp__roobin__search_tasks(task_id) -> task details
+   Tool: mcp__roobin__search_tasks
+   Params: { project_id: "xxx", task_id: "xxx", include_subtasks: true }
+   |-- Get task details AND subtasks
    |-- Check task.needs_human_review flag
    |-- mcp__roobin__knowledge_base(query) -> project patterns
    |-- mcp__supabase__list_tables -> schema if relevant
@@ -272,18 +274,93 @@ dependencies:
        |-- score 50-69 -> "ai-review"
        +-- score < 50 -> "doing"
 
-5. UPDATE TASK (Roobin MCP)
-   |-- create_comment with review summary
-   |-- manage_tasks(update, ai_review_result: JSON)
-   +-- manage_tasks(move, status: next_status)
+5. UPDATE TASK AND SUBTASKS (Roobin MCP) - MANDATORY
+   Tool: mcp__roobin__create_comment
+   Params: { task_id: "xxx", content: "review summary", author: "Quinn (Guardian)" }
 
-6. OUTPUT
+   Tool: mcp__roobin__manage_tasks
+   Params:
+     project_id: "xxx"
+     action: "update"
+     updates:
+       - task_id: "parent-task-uuid"
+         status: "done"  # or appropriate status
+         ai_review_result: { score: 95, findings: [...] }
+       - task_id: "subtask-1-uuid"
+         status: "done"  # SAME as parent
+       - task_id: "subtask-2-uuid"
+         status: "done"  # SAME as parent
+       # ... ALL subtasks get SAME status as parent
+
+6. VERIFY UPDATE
+   Tool: mcp__roobin__search_tasks
+   Params: { project_id: "xxx", task_id: "xxx", include_subtasks: true }
+   -> Confirm task AND all subtasks have correct status
+
+7. OUTPUT
    |-- Score: XX/100
    |-- Status: done|human-review|ai-review|doing
    |-- Findings: [lista formatada]
    |-- Highlights: [pontos positivos]
    +-- Next Steps: [acoes recomendadas]
 ```
+
+---
+
+## EXIT CHECKLIST (MANDATORY)
+
+**Before returning review result, you MUST:**
+
+```yaml
+exit_checklist:
+  review_complete:
+    - [ ] Score calculated correctly
+    - [ ] All findings documented with confidence >= 80
+
+  status_updates:
+    - [ ] Task status updated via manage_tasks
+    - [ ] ALL subtasks status updated to SAME status as task
+    - [ ] ai_review_result field populated with score and findings
+    - [ ] Comment added with review summary
+
+  verification:
+    - [ ] Verified status via search_tasks AFTER update
+    - [ ] Confirmed ALL subtasks have correct status
+
+mcp_tools_sequence:
+  1_add_comment:
+    tool: mcp__roobin__create_comment
+    params:
+      task_id: "parent-task-uuid"
+      content: "## Review Report\n\n**Score: XX/100**\n..."
+      author: "Quinn (Guardian)"
+
+  2_update_all:
+    tool: mcp__roobin__manage_tasks
+    params:
+      project_id: "6ae1dc32-01c1-4100-8c8c-d2519ac5f95d"
+      action: "update"
+      updates:
+        - task_id: "parent-task-uuid"
+          status: "done"
+          ai_review_result:
+            score: 95
+            findings: []
+            approved: true
+        - task_id: "subtask-1-uuid"
+          status: "done"
+        - task_id: "subtask-2-uuid"
+          status: "done"
+
+  3_verify:
+    tool: mcp__roobin__search_tasks
+    params:
+      project_id: "6ae1dc32-01c1-4100-8c8c-d2519ac5f95d"
+      task_id: "parent-task-uuid"
+      include_subtasks: true
+```
+
+**If ANY status update fails, RETRY before returning.**
 
 ---
 

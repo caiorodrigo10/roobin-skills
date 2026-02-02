@@ -142,11 +142,13 @@ agent_collaboration:
 
 ```
 1. Get Task from Roobin MCP
-   -> search_tasks to find assigned tasks
+   Tool: mcp__roobin__search_tasks
+   Params: { project_id: "xxx", task_id: "xxx", include_subtasks: true }
 
 2. Start Implementation
-   -> manage_tasks(status: "doing")
-   -> Read task requirements
+   Tool: mcp__roobin__manage_tasks
+   Params: { action: "update", updates: [{ task_id: "xxx", status: "doing" }] }
+   -> Also update subtasks to "doing" as you work on each
 
 3. Implement
    -> Write code following existing patterns
@@ -157,11 +159,65 @@ agent_collaboration:
    -> Use self-critique-checklist before completion
    -> Fix any issues found
 
-5. Complete
-   -> manage_tasks(status: "ai-review")
+5. Complete (MANDATORY EXIT CHECKLIST)
+   -> Run EXIT CHECKLIST below
+   -> Update task AND ALL subtasks to "ai-review"
    -> create_comment with summary
    -> Notify: "Ready for roobin-reviewer"
 ```
+
+---
+
+## EXIT CHECKLIST (MANDATORY)
+
+**Before returning "implementation complete", you MUST:**
+
+```yaml
+exit_checklist:
+  code_quality:
+    - [ ] pnpm lint passes (zero errors)
+    - [ ] pnpm build passes (zero errors)
+    - [ ] No console.log or debug artifacts
+    - [ ] No hardcoded values or secrets
+
+  status_updates:
+    - [ ] Task status updated to "ai-review"
+    - [ ] ALL subtasks status updated to "ai-review"
+    - [ ] Comment added with summary of changes
+
+  verification:
+    - [ ] Verified status via search_tasks AFTER update
+    - [ ] If status not updated, retry manage_tasks
+
+mcp_tools_used:
+  update_status:
+    tool: mcp__roobin__manage_tasks
+    params:
+      project_id: "6ae1dc32-01c1-4100-8c8c-d2519ac5f95d"
+      action: "update"
+      updates:
+        - task_id: "parent-task-uuid"
+          status: "ai-review"
+        - task_id: "subtask-1-uuid"
+          status: "ai-review"
+        # ... all subtasks
+
+  verify_status:
+    tool: mcp__roobin__search_tasks
+    params:
+      project_id: "6ae1dc32-01c1-4100-8c8c-d2519ac5f95d"
+      task_id: "parent-task-uuid"
+      include_subtasks: true
+
+  add_comment:
+    tool: mcp__roobin__create_comment
+    params:
+      task_id: "parent-task-uuid"
+      content: "## Implementation Complete\n\n### Changes\n- ..."
+      author: "Dex (Builder)"
+```
+
+**If ANY item is not checked, DO NOT return "complete".**
 
 ## Commands
 

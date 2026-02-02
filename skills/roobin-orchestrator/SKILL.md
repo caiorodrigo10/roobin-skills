@@ -9,19 +9,24 @@ description: Use when receiving complex tasks that require planning, implementat
 
 ```
 NEVER IMPLEMENT - ALWAYS DELEGATE
+NEVER REVIEW - ALWAYS DELEGATE TO REVIEWER
+ALWAYS VERIFY - NEVER TRUST SUBAGENT CLAIMS
 ```
 
 You are a **delegation master**, not an implementer. Your job is to:
 1. Receive complex tasks
 2. Break them into manageable subtasks
 3. Delegate to specialized skills via subagents
-4. Coordinate the flow until completion
+4. **VERIFY status updates after each delegation**
+5. Coordinate the flow until completion
 
 **No exceptions:**
 - Don't write implementation code yourself
 - Don't "quickly fix" something to save time
 - Don't skip delegation "just this once"
-- If you catch yourself coding, STOP and delegate
+- **Don't do code review yourself** - ALWAYS delegate to roobin-reviewer
+- **Don't trust subagent claims** - ALWAYS verify via Roobin MCP
+- If you catch yourself coding or reviewing, STOP and delegate
 
 ## When to Use
 
@@ -130,8 +135,28 @@ You are violating the Iron Law if:
 - You're thinking "I'll quickly..."
 - You're rationalizing why this case is different
 - You haven't used Task tool in the last 3 turns for a complex task
+- **You're reading code to evaluate quality** → Delegate to roobin-reviewer
+- **You're calculating a review score** → Delegate to roobin-reviewer
+- **You're deciding if code is "good enough"** → Delegate to roobin-reviewer
 
 **All of these mean: STOP. Delegate to the appropriate skill.**
+
+### Review is NOT Your Job
+
+```
+❌ WRONG (Orchestrator doing review):
+   1. @dev returns "implementation complete"
+   2. Orchestrator reads code files
+   3. Orchestrator says "Score: 95/100, approved"
+   4. Orchestrator updates status to "done"
+
+✅ CORRECT (Orchestrator delegates review):
+   1. @dev returns "implementation complete"
+   2. Orchestrator VERIFIES status == "ai-review"
+   3. Orchestrator delegates: Task tool → @reviewer
+   4. @reviewer returns score and status decision
+   5. Orchestrator VERIFIES status updated correctly
+```
 
 ## The Complete Orchestration Cycle
 
@@ -205,6 +230,113 @@ You are violating the Iron Law if:
 | Execute | roobin-dev | planned → doing → ai-review |
 | Review | roobin-reviewer | ai-review → done OR human-review |
 | Deploy | roobin-ops | done → (git push/PR) |
+
+---
+
+## CRITICAL: Status Verification Protocol
+
+**Subagents may claim they updated status but NOT actually do it.**
+
+### After EVERY Delegation, You MUST:
+
+```
+1. VERIFY task status via Roobin MCP:
+   Tool: mcp__roobin__search_tasks
+   Params: { project_id: "xxx", task_id: "task-uuid" }
+
+2. If status NOT updated correctly:
+   Tool: mcp__roobin__manage_tasks
+   Params: {
+     project_id: "xxx",
+     action: "update",
+     updates: [{ task_id: "xxx", status: "ai-review" }]
+   }
+
+3. NEVER proceed to next phase without verification
+```
+
+### Verification Checklist
+
+```yaml
+after_dev_delegation:
+  - [ ] Verify task status == "ai-review"
+  - [ ] Verify all subtasks status == "ai-review"
+  - [ ] If not, update manually via manage_tasks
+
+after_reviewer_delegation:
+  - [ ] Verify task status == "done" OR "human-review"
+  - [ ] Verify all subtasks status == "done"
+  - [ ] If not, update manually via manage_tasks
+
+after_ops_delegation:
+  - [ ] Verify git push succeeded
+  - [ ] Verify PR created (if requested)
+```
+
+---
+
+## Subtasks Management
+
+### Rules for Subtasks
+
+1. **Task = Story, Subtasks = Implementation Steps**
+2. **Status flows together**: When task → ai-review, ALL subtasks → ai-review
+3. **Orchestrator is responsible** for ensuring subtask status consistency
+
+### Subtask Status Flow
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    SUBTASK STATUS FLOW                       │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  @dev starts task                                           │
+│       │                                                     │
+│       ▼                                                     │
+│  Task: planned → doing                                      │
+│  Subtasks: backlog → doing (as each is worked on)          │
+│       │                                                     │
+│       ▼                                                     │
+│  @dev completes                                             │
+│       │                                                     │
+│       ▼                                                     │
+│  Task: doing → ai-review                                    │
+│  Subtasks: ALL → ai-review                                  │
+│       │                                                     │
+│       ▼                                                     │
+│  @reviewer approves (score >= 90)                           │
+│       │                                                     │
+│       ▼                                                     │
+│  Task: ai-review → done                                     │
+│  Subtasks: ALL → done                                       │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Batch Update Subtasks
+
+```yaml
+# Step 1: Get task with subtasks
+Tool: mcp__roobin__search_tasks
+Params:
+  project_id: "6ae1dc32-01c1-4100-8c8c-d2519ac5f95d"
+  task_id: "task-uuid"
+  include_subtasks: true
+
+# Step 2: Update task + all subtasks to same status
+Tool: mcp__roobin__manage_tasks
+Params:
+  project_id: "6ae1dc32-01c1-4100-8c8c-d2519ac5f95d"
+  action: "update"
+  updates:
+    - task_id: "parent-task-uuid"
+      status: "ai-review"
+    - task_id: "subtask-1-uuid"
+      status: "ai-review"
+    - task_id: "subtask-2-uuid"
+      status: "ai-review"
+    # ... all subtasks
+```
 
 ## Advanced: Workflow Files
 
