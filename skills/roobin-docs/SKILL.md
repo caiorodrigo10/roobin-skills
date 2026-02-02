@@ -1,50 +1,50 @@
 ---
 name: roobin-docs
-description: Documentar features, criar e atualizar documentação no Roobin MCP. Use ao finalizar tasks de feature/improvement, ao corrigir bugs em features documentadas, ou quando o usuário mencionar documentar, doc, atualizar documentação.
+description: Document features, create and update documentation in Roobin MCP. Use when finishing feature/improvement tasks, when fixing bugs in documented features, or when user mentions document, doc, update documentation.
 ---
 
 # Roobin Docs
 
 ## Overview
 
-Criação e atualização de documentação de features no Roobin MCP.
+Create and update feature documentation in Roobin MCP.
 
-**Core principle:** Sempre versionar antes de atualizar. Sempre publicar direto. Inferir tipo pelo contexto.
+**Core principle:** Always version before updating. Always publish directly. Infer type from context.
 
-**Announce at start:** "Estou usando roobin-docs para [criar/atualizar] a documentação."
+**Announce at start:** "I'm using roobin-docs to [create/update] the documentation."
 
 ## The Iron Laws
 
 ```
-SEMPRE VERSIONAR ANTES DE UPDATE
-SEMPRE PUBLICAR DIRETO (status: published)
-PERGUNTAR SOBRE DOC AO FINALIZAR FEATURE
-BUSCAR DOC EXISTENTE AO FINALIZAR BUG
+ALWAYS VERSION BEFORE UPDATE
+ALWAYS PUBLISH DIRECTLY (status: published)
+ASK ABOUT DOC WHEN FINISHING FEATURE
+SEARCH FOR EXISTING DOC WHEN FINISHING BUG
 ```
 
 ## When to Use
 
-- ✓ Ao finalizar task de feature/improvement → perguntar se quer documentar
-- ✓ Ao finalizar task de bug → buscar doc relacionada e perguntar se quer atualizar
-- ✓ Usuário menciona "documentar", "doc", "atualizar documentação"
-- ✗ Não use para gerenciamento de tasks (use roobin-tasks)
+- ✓ When finishing feature/improvement task → ask if want to document
+- ✓ When finishing bug task → search for related doc and ask if want to update
+- ✓ User mentions "document", "doc", "update documentation"
+- ✗ Don't use for task management (use roobin-tasks)
 
 ## Common Rationalizations That Mean You're About To Fail
 
-- "Não precisa documentar, é feature pequena" → ERRADO. Pergunte ao usuário.
-- "Vou atualizar sem versionar" → ERRADO. Sempre crie versão antes.
-- "Vou criar como draft" → ERRADO. Publique direto.
-- "Sei qual template usar" → ERRADO. Infira pelo contexto ou pergunte.
+- "No need to document, it's a small feature" → WRONG. Ask the user.
+- "I'll update without versioning" → WRONG. Always create version first.
+- "I'll create as draft" → WRONG. Publish directly.
+- "I know which template to use" → WRONG. Infer from context or ask.
 
 ---
 
-## Configuração
+## Configuration
 
-### Projeto e Usuário
-Obter `project_id` e `user_id` do CLAUDE.md do projeto atual. Se não existir, perguntar ao usuário ou listar projetos com `list_projects()`.
+### Project and User
+Get `project_id` and `user_id` from CLAUDE.md of the current project. If not present, ask the user or list projects with `list_projects()`.
 
 ### Defaults
-| Campo | Default |
+| Field | Default |
 |-------|---------|
 | `status` | `"published"` |
 | `author` | `"Agent AI"` |
@@ -52,158 +52,158 @@ Obter `project_id` e `user_id` do CLAUDE.md do projeto atual. Se não existir, p
 
 ---
 
-## Gatilhos Automáticos
+## Automatic Triggers
 
-### 1. Ao finalizar task de feature/improvement
-
-```
-✓ Task "Implementar dark mode" → review
-
-ℹ Quer documentar essa feature? (s/n)
-```
-
-### 2. Ao finalizar task de bug
+### 1. When finishing feature/improvement task
 
 ```
-✓ Task "Corrigir erro no dark mode" → done
+✓ Task "Implement dark mode" → review
 
-ℹ Encontrei documentação existente: "Dark Mode" (guides)
-ℹ Quer atualizar a documentação? (s/n)
+ℹ Do you want to document this feature? (y/n)
+```
+
+### 2. When finishing bug task
+
+```
+✓ Task "Fix error in dark mode" → done
+
+ℹ Found existing documentation: "Dark Mode" (guides)
+ℹ Do you want to update the documentation? (y/n)
 ```
 
 ---
 
-## Tipos de Documento (Folders)
+## Document Types (Folders)
 
-O Roobin organiza documentos em **folders** (pastas). Use o campo `document_type` para definir a pasta:
+Roobin organizes documents in **folders**. Use the `document_type` field to set the folder:
 
-| Folder | Descrição | Quando usar | Template |
-|--------|-----------|-------------|----------|
-| `planning` | PRDs, roadmaps, estratégia | Requisitos de produto, planejamento | [planning.md](templates/planning.md) |
-| `architecture` | ADRs, diagramas, decisões técnicas | Arquitetura, design de sistema | [architecture.md](templates/architecture.md) |
-| `specs` | Especificações, APIs, contratos | Specs técnicas, documentação de API | [specs.md](templates/specs.md), [specs-api.md](templates/specs-api.md) |
-| `guides` | Tutoriais, how-tos, documentação | Guias de uso, onboarding | [guides.md](templates/guides.md) |
-| `research` | Análises, descobertas, estudos | Pesquisa de usuário, análise técnica | - |
-| `quality` | Testes, QA, qualidade | Planos de teste, relatórios de QA | - |
-| `reports` | Reuniões, status, relatórios | Atas, status reports | - |
-| `general` | Notas, misc | Anotações gerais, rascunhos | - |
+| Folder | Description | When to use | Template |
+|--------|-------------|-------------|----------|
+| `planning` | PRDs, roadmaps, strategy | Product requirements, planning | [planning.md](templates/planning.md) |
+| `architecture` | ADRs, diagrams, technical decisions | Architecture, system design | [architecture.md](templates/architecture.md) |
+| `specs` | Specifications, APIs, contracts | Technical specs, API documentation | [specs.md](templates/specs.md), [specs-api.md](templates/specs-api.md) |
+| `guides` | Tutorials, how-tos, documentation | Usage guides, onboarding | [guides.md](templates/guides.md) |
+| `research` | Analysis, findings, studies | User research, technical analysis | - |
+| `quality` | Tests, QA, quality | Test plans, QA reports | - |
+| `reports` | Meetings, status, reports | Minutes, status reports | - |
+| `general` | Notes, misc | General notes, drafts | - |
 
-### Inferência Automática de Folder
+### Automatic Folder Inference
 
-| Contexto da task | Folder inferido |
-|------------------|-----------------|
-| Feature de UI/UX | `guides` |
-| Feature de API/backend | `specs` |
-| Feature de arquitetura | `architecture` |
-| Planejamento/requisitos | `planning` |
-| Testes/QA | `quality` |
-| Pesquisa/análise | `research` |
-| Reunião/status | `reports` |
+| Task context | Inferred folder |
+|--------------|-----------------|
+| UI/UX feature | `guides` |
+| API/backend feature | `specs` |
+| Architecture feature | `architecture` |
+| Planning/requirements | `planning` |
+| Tests/QA | `quality` |
+| Research/analysis | `research` |
+| Meeting/status | `reports` |
 | Default | `general` |
 
 ---
 
-## Fluxo de Trabalho
+## Workflow
 
-### Criar Documentação
+### Create Documentation
 
-1. Anunciar uso da skill
-2. Obter project_id do CLAUDE.md ou perguntar
-3. Inferir tipo ou perguntar ao usuário
-4. Carregar template apropriado de [templates/](templates/)
-5. Preencher template com informações da feature
-6. Criar documento com status `published`
+1. Announce skill usage
+2. Get project_id from CLAUDE.md or ask
+3. Infer type or ask user
+4. Load appropriate template from [templates/](templates/)
+5. Fill template with feature information
+6. Create document with status `published`
 
-### Atualizar Documentação
+### Update Documentation
 
-1. Anunciar uso da skill
-2. Buscar documento existente
-3. **CRIAR VERSÃO** antes de modificar
-4. Atualizar documento
-5. Confirmar mudanças
-
----
-
-## Versionamento
-
-### Regra: SEMPRE criar versão antes de update
-
-```
-✓ Versão 3 criada: "Atualização após correção de bug no login"
-✓ Documento "Sistema de Autenticação" atualizado
-```
+1. Announce skill usage
+2. Search for existing document
+3. **CREATE VERSION** before modifying
+4. Update document
+5. Confirm changes
 
 ---
 
-## Integração com roobin-tasks
+## Versioning
 
-A skill `roobin-tasks` deixa contexto quando finaliza task:
-- Título da task
-- Tipo da task (feature, bug, improvement)
-- Status final (review, done)
+### Rule: ALWAYS create version before update
 
-A skill `roobin-docs` lê esse contexto e:
-1. Se `type: feature/improvement` → Pergunta se quer documentar
-2. Se `type: bug` → Busca doc relacionada e pergunta se quer atualizar
-
----
-
-## Formato de Output
-
-### Criação
 ```
-✓ Documentação criada:
-  - [doc-123] {Título}
-  - Tipo: {type} | Status: published
-  - Seções: {lista de seções principais}
-```
-
-### Atualização
-```
-✓ Versão 3 salva: "{change_summary}"
-✓ Documentação atualizada:
-  - [doc-123] {Título}
-  - Mudanças: {resumo das alterações}
-```
-
-### Busca
-```
-ℹ Documentação encontrada para "{feature}":
-  - [doc-123] {Título} (specs, v3)
-  - Última atualização: {data}
+✓ Version 3 created: "Update after login bug fix"
+✓ Document "Authentication System" updated
 ```
 
 ---
 
-## Diagramas Mermaid
+## Integration with roobin-tasks
 
-O Roobin suporta diagramas Mermaid renderizados visualmente nos documentos. **Use sempre que documentar arquitetura, fluxos, ou design system.**
+The `roobin-tasks` skill leaves context when finishing a task:
+- Task title
+- Task type (feature, bug, improvement)
+- Final status (review, done)
 
-### Sintaxe Básica
+The `roobin-docs` skill reads this context and:
+1. If `type: feature/improvement` → Ask if want to document
+2. If `type: bug` → Search for related doc and ask if want to update
 
-Envolver código Mermaid em bloco de código com linguagem `mermaid`:
+---
+
+## Output Format
+
+### Creation
+```
+✓ Documentation created:
+  - [doc-123] {Title}
+  - Type: {type} | Status: published
+  - Sections: {list of main sections}
+```
+
+### Update
+```
+✓ Version 3 saved: "{change_summary}"
+✓ Documentation updated:
+  - [doc-123] {Title}
+  - Changes: {summary of changes}
+```
+
+### Search
+```
+ℹ Documentation found for "{feature}":
+  - [doc-123] {Title} (specs, v3)
+  - Last updated: {date}
+```
+
+---
+
+## Mermaid Diagrams
+
+Roobin supports Mermaid diagrams rendered visually in documents. **Always use when documenting architecture, flows, or design system.**
+
+### Basic Syntax
+
+Wrap Mermaid code in a code block with `mermaid` language:
 
 ````
 ```mermaid
 graph TD
-    A[Início] --> B[Processo]
-    B --> C[Fim]
+    A[Start] --> B[Process]
+    B --> C[End]
 ```
 ````
 
-### Tipos de Diagrama Recomendados
+### Recommended Diagram Types
 
-| Tipo | Uso | Exemplo |
+| Type | Use | Example |
 |------|-----|---------|
-| `graph TD` | Fluxos verticais (top-down) | Arquitetura de componentes |
-| `graph LR` | Fluxos horizontais (left-right) | Pipelines, CI/CD |
-| `sequenceDiagram` | Interações entre sistemas | Fluxos de API, auth |
-| `erDiagram` | Modelo de dados | Schema de banco |
-| `flowchart` | Decisões e branches | Lógica de negócio |
+| `graph TD` | Vertical flows (top-down) | Component architecture |
+| `graph LR` | Horizontal flows (left-right) | Pipelines, CI/CD |
+| `sequenceDiagram` | System interactions | API flows, auth |
+| `erDiagram` | Data model | Database schema |
+| `flowchart` | Decisions and branches | Business logic |
 
-### Exemplos por Contexto
+### Examples by Context
 
-#### Arquitetura de Sistema
+#### System Architecture
 ```mermaid
 graph TB
     subgraph Frontend
@@ -219,7 +219,7 @@ graph TB
     API --> DB
 ```
 
-#### Fluxo de Requisição
+#### Request Flow
 ```mermaid
 sequenceDiagram
     participant User
@@ -232,7 +232,7 @@ sequenceDiagram
     API-->>User: Response
 ```
 
-#### Modelo de Dados
+#### Data Model
 ```mermaid
 erDiagram
     users ||--o{ projects : owns
@@ -251,61 +251,61 @@ erDiagram
     }
 ```
 
-#### Fluxo de Decisão
+#### Decision Flow
 ```mermaid
 flowchart TD
-    A[Início] --> B{Condição?}
-    B -->|Sim| C[Ação 1]
-    B -->|Não| D[Ação 2]
-    C --> E[Fim]
+    A[Start] --> B{Condition?}
+    B -->|Yes| C[Action 1]
+    B -->|No| D[Action 2]
+    C --> E[End]
     D --> E
 ```
 
-### Regras de Sintaxe Importantes
+### Important Syntax Rules
 
-| ❌ Evitar | ✅ Usar | Motivo |
-|-----------|---------|--------|
-| `HOME[/home]` | `HOME[home]` | `/` é operador especial |
-| `Node["texto"]` | `Node[texto]` | Aspas só se necessário |
-| `A --> B (info)` | `A --> B` | Parênteses em labels causam erro |
-| `subgraph "Nome"` | `subgraph Nome` | Aspas podem causar problemas |
+| ❌ Avoid | ✅ Use | Reason |
+|----------|--------|--------|
+| `HOME[/home]` | `HOME[home]` | `/` is a special operator |
+| `Node["text"]` | `Node[text]` | Quotes only if necessary |
+| `A --> B (info)` | `A --> B` | Parentheses in labels cause errors |
+| `subgraph "Name"` | `subgraph Name` | Quotes can cause issues |
 
-### Quando Usar Mermaid
+### When to Use Mermaid
 
-- ✓ Documentação de arquitetura (`architecture`)
-- ✓ Especificações com fluxos (`specs`)
-- ✓ Documentação de API com sequências (`specs`)
-- ✓ Guias com fluxos de usuário (`guides`)
-- ✓ Qualquer doc que beneficie de visualização
+- ✓ Architecture documentation (`architecture`)
+- ✓ Specifications with flows (`specs`)
+- ✓ API documentation with sequences (`specs`)
+- ✓ Guides with user flows (`guides`)
+- ✓ Any doc that benefits from visualization
 
-### Temas
+### Themes
 
-O Mermaid renderiza automaticamente no tema correto (dark/light) baseado no tema do Roobin.
+Mermaid automatically renders in the correct theme (dark/light) based on the Roobin theme.
 
 ---
 
-## Tools MCP Roobin
+## Roobin MCP Tools
 
-| Ação | Tool |
-|------|------|
-| Buscar | `mcp__roobin__search_documents` |
-| Criar | `mcp__roobin__manage_document` (action: create) |
-| Atualizar | `mcp__roobin__manage_document` (action: update) |
-| Versionar | `mcp__roobin__manage_version` (action: create) |
-| Ver versões | `mcp__roobin__find_versions` |
+| Action | Tool |
+|--------|------|
+| Search | `mcp__roobin__search_documents` |
+| Create | `mcp__roobin__manage_document` (action: create) |
+| Update | `mcp__roobin__manage_document` (action: update) |
+| Version | `mcp__roobin__manage_version` (action: create) |
+| View versions | `mcp__roobin__find_versions` |
 
-### Parâmetros de manage_document
+### manage_document Parameters
 
 ```yaml
 mcp__roobin__manage_document:
   action: "create"  # create | update | delete
   project_id: "{project_id}"
-  title: "Título do documento"
+  title: "Document title"
   content:
     markdown: |
-      # Conteúdo em markdown
+      # Content in markdown
 
-      Suporta rich blocks:
+      Supports rich blocks:
       - <toggle title="...">content</toggle>
       - <callout type="info|warning|tip|error">content</callout>
       - <quote author="..." source="...">content</quote>
@@ -316,24 +316,24 @@ mcp__roobin__manage_document:
   is_pinned: false
 ```
 
-### Parâmetros de search_documents
+### search_documents Parameters
 
 ```yaml
 mcp__roobin__search_documents:
   project_id: "{project_id}"
-  query: "termo de busca"       # busca por título/conteúdo
-  document_id: "{document_id}"  # busca direta por ID
-  document_type: "specs"        # filtrar por folder
+  query: "search term"           # search by title/content
+  document_id: "{document_id}"   # direct search by ID
+  document_type: "specs"         # filter by folder
 ```
 
 ---
 
 ## Checklist
 
-- [ ] Anunciei uso da skill
-- [ ] Obtive project_id do CLAUDE.md ou perguntei
-- [ ] Inferi tipo ou perguntei ao usuário
-- [ ] Usei template apropriado
-- [ ] Incluí diagramas Mermaid para arquitetura/fluxos
-- [ ] Versionei antes de atualizar (se update)
-- [ ] Publiquei direto (status: published)
+- [ ] Announced skill usage
+- [ ] Got project_id from CLAUDE.md or asked
+- [ ] Inferred type or asked user
+- [ ] Used appropriate template
+- [ ] Included Mermaid diagrams for architecture/flows
+- [ ] Versioned before updating (if update)
+- [ ] Published directly (status: published)
